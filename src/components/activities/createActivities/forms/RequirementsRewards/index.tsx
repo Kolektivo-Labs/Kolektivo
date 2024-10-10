@@ -76,7 +76,25 @@ export default function CreateActivityRequirementsRewards({ submitHandler, backH
     mode: 'onBlur',
   })
 
+  const cleanDisabledRequirementsOptions = () => {
+    requirementsOptions.forEach((requirementOption) => {
+      requirementOption.disabled = false
+    })
+  }
+
+  function updateDisabledRequirementsOptions(updatedRequirements: string[]) {
+    updatedRequirements.forEach((requirement) => {
+      const selectedRequirementOptionIndex = requirementsOptions.findIndex(
+        (requirementOption) => requirementOption.value == requirement,
+      )
+      if (selectedRequirementOptionIndex != -1) {
+        requirementsOptions[selectedRequirementOptionIndex].disabled = true
+      }
+    })
+  }
+
   const handleRequirementsChange = (event: SelectChangeEvent<string>, index: number) => {
+    console.log('Requirements select change')
     const {
       target: { value },
     } = event
@@ -87,16 +105,11 @@ export default function CreateActivityRequirementsRewards({ submitHandler, backH
     const updatedRequirements = [...requirements]
     updatedRequirements[index] = value
 
-    requirementsOptions.forEach((requirementOption) => {
-      requirementOption.disabled = false
-    })
+    console.log('Value: ' + value)
 
-    updatedRequirements.forEach((requirement) => {
-      const selectedRequirementOptionIndex = requirementsOptions.findIndex(
-        (requirementOption) => requirementOption.value == requirement,
-      )
-      requirementsOptions[selectedRequirementOptionIndex].disabled = true
-    })
+    cleanDisabledRequirementsOptions()
+
+    updateDisabledRequirementsOptions(updatedRequirements)
 
     setRequirements(updatedRequirements)
   }
@@ -128,12 +141,16 @@ export default function CreateActivityRequirementsRewards({ submitHandler, backH
     } else {
       setValue('requirements', requirements)
     }
-    console.log(requirements)
+    console.log('Requirements: ', requirements)
   }, [setValue, requirements])
 
   useEffect(() => {
-    console.log(isValid)
+    console.log('Is valid: ' + isValid)
   }, [isValid])
+
+  useEffect(() => {
+    cleanDisabledRequirementsOptions()
+  }, [])
 
   return (
     <Card>
@@ -157,7 +174,7 @@ export default function CreateActivityRequirementsRewards({ submitHandler, backH
                               disabled={requirementOption.disabled}
                               value={requirementOption.value}
                             >
-                              {requirementOption.value}
+                              {requirementOption.label}
                             </MenuItem>
                           ))}
                         </Select>
@@ -207,7 +224,7 @@ export default function CreateActivityRequirementsRewards({ submitHandler, backH
                   </MenuItem>
                   {stampsOptions.map((stampOption) => (
                     <MenuItem key={stampOption.value} disabled={stampOption.disabled} value={stampOption.value}>
-                      {stampOption.value}
+                      {stampOption.label}
                     </MenuItem>
                   ))}
                 </Select>
